@@ -9,6 +9,10 @@
 #include <string>
 #include <utility>
 
+#ifndef _WIN32
+#define _byteswap_ulong __builtin_bswap32
+#endif
+
 template<typename __ConfigType>
 class WinRarKeygen {
 public:
@@ -231,3 +235,8 @@ public:
         return RegInfo;
     }
 };
+
+#ifndef _WIN32
+#undef _byteswap_ulong
+#endif
+

@@ -1,7 +1,8 @@
 #pragma once
 #include <stddef.h>
 #include <stdint.h>
-#include <gmp.h>
+#include <string.h>
+#include <mpir.h>
 #include <vector>
 #include <string>
 #include <type_traits>

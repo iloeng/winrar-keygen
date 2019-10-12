@@ -1,6 +1,20 @@
+#ifdef _WIN32
 #include <tchar.h>
-#include <stdio.h>
 #include <windows.h>
+#ifdef __GNUC__
+#define MINGW_HAS_SECURE_API
+#include <sec_api/stdio_s.h>
+#define _tprintf_s printf_s
+#endif
+#define HS "hs"
+#else
+#define PTSTR char*
+#define _putts puts
+#define _tprintf_s printf
+#define TEXT(s) s
+#define HS "s"
+#endif
+#include <stdio.h>
 #include <locale.h>
 #include "WinRarConfig.hpp"
 #include "WinRarKeygen.hpp"
@@ -18,15 +32,16 @@ void Help() {
 }
 
 void PrintRegisterInfo(const WinRarKeygen<WinRarConfig>::RegisterInfo& Info) {
-    _tprintf_s(TEXT("%hs\n"), "RAR registration data");
-    _tprintf_s(TEXT("%hs\n"), Info.UserName.c_str());
-    _tprintf_s(TEXT("%hs\n"), Info.LicenseType.c_str());
-    _tprintf_s(TEXT("UID=%hs\n"), Info.UID.c_str());
+    _tprintf_s(TEXT("%" HS "\n"), "RAR registration data");
+    _tprintf_s(TEXT("%" HS "\n"), Info.UserName.c_str());
+    _tprintf_s(TEXT("%" HS "\n"), Info.LicenseType.c_str());
+    _tprintf_s(TEXT("UID=%" HS "\n"), Info.UID.c_str());
     for (size_t i = 0; i < Info.HexData.length(); i += 54) {
-        _tprintf_s(TEXT("%.54hs\n"), Info.HexData.c_str() + i);
+        _tprintf_s(TEXT("%.54" HS "\n"), Info.HexData.c_str() + i);
     }
 }
 
+#ifdef _WIN32
 std::string ToACP(PCWSTR lpszUnicodeString) {
     int len;
 
@@ -50,8 +65,13 @@ std::string ToACP(PCWSTR lpszUnicodeString) {
 
     return Result;
 }
+#endif
 
+#ifdef WIN32
 int _tmain(int argc, PTSTR argv[]) {
+#else
+int main(int argc, PTSTR argv[]) {
+#endif
     setlocale(LC_ALL, "");
     if (argc == 3) {
         try {
@@ -63,7 +83,7 @@ int _tmain(int argc, PTSTR argv[]) {
 #endif
             );
         } catch (std::exception& e) {
-            _tprintf_s(TEXT("%hs\n"), e.what());
+            _tprintf_s(TEXT("%" HS "\n"), e.what());
             return -1;
         }
     } else {

@@ -1,6 +1,80 @@
 #pragma once
 
-#ifdef _MSC_VER
+#ifndef _WIN32
+#include <string.h>
+#include "cryptonite/cryptonite_sha1.h"
+
+//ndef _WIN32
+struct HasherSha1Traits {
+public:
+    static constexpr size_t BlockSize = 512 / 8;
+    static constexpr size_t DigestSize = 160 / 8;
+
+    struct DigestType {
+        unsigned char Bytes[DigestSize];
+    };
+
+    struct ContextType {
+        struct sha1_ctx* hHash;
+
+        ContextType() noexcept :
+            hHash(NULL) {}
+
+        ContextType(const ContextType& Other) noexcept = default;
+
+        ContextType(ContextType&& Other) noexcept : hHash(Other.hHash) {
+            Other.hHash = NULL;
+        }
+
+        ContextType& operator=(const ContextType& Other) noexcept = default;
+
+        ContextType& operator=(ContextType&& Other) noexcept {
+            hHash = Other.hHash;
+            Other.hHash = NULL;
+            return *this;
+        }
+    };
+
+public:
+    static inline ContextType ContextCreate() {
+        ContextType Ctx;
+        Ctx.hHash = (struct sha1_ctx*)malloc(sizeof(sha1_ctx));
+        cryptonite_sha1_init(Ctx.hHash);
+
+        return Ctx;
+    }
+
+    static inline ContextType ContextCreate(const void* lpBuffer, size_t cbBuffer) {
+        ContextType Ctx = ContextCreate();
+        ContextUpdate(Ctx, lpBuffer, cbBuffer);
+
+        return Ctx;
+    }
+
+    static inline ContextType ContextCopy(const ContextType& Ctx) {
+        ContextType NewCtx;
+        NewCtx.hHash = (struct sha1_ctx*)malloc(sizeof(sha1_ctx));
+        memcpy(NewCtx.hHash,Ctx.hHash,sizeof(sha1_ctx));
+
+        return NewCtx;
+    }
+
+    static inline void ContextUpdate(ContextType& Ctx, const void* lpBuffer, size_t cbBuffer) {
+        cryptonite_sha1_update(Ctx.hHash, (unsigned char*)lpBuffer, cbBuffer);
+    }
+
+    static inline void ContextEvaluate(const ContextType& Ctx, DigestType& Digest) {
+        cryptonite_sha1_finalize(Ctx.hHash, Digest.Bytes);
+    }
+
+    static inline void ContextDestroy(ContextType& Ctx) noexcept {
+        if (Ctx.hHash) {
+            free(Ctx.hHash);
+            Ctx.hHash = NULL;
+        }
+    }
+};
+#else
 #include <windows.h>
 #include <wincrypt.h>
 #include <system_error>
@@ -19,9 +93,6 @@ public:
 
         ContextType() noexcept : 
             hHash(NULL) {}
-
-        ContextType(HCRYPTHASH HashHandle) noexcept :
-            hHash(HashHandle) {}
 
         ContextType(const ContextType& Other) noexcept = default;
 
@@ -78,27 +149,7 @@ public:
     }
 
     static inline ContextType ContextCreate(const void* lpBuffer, size_t cbBuffer) {
-        ContextType Ctx;
-
-        if (CryptProvider.Handle == NULL) {
-            if (!CryptAcquireContext(&CryptProvider.Handle, NULL, MS_ENH_RSA_AES_PROV, PROV_RSA_AES, 0)) {
-                auto err = GetLastError();
-                if (err == NTE_BAD_KEYSET) {
-                    if (!CryptAcquireContext(&CryptProvider.Handle, NULL, MS_ENH_RSA_AES_PROV, PROV_RSA_AES, CRYPT_NEWKEYSET)) {
-                        err = GetLastError();
-                        throw std::system_error(err, std::system_category());
-                    }
-                } else {
-                    throw std::system_error(err, std::system_category());
-                }
-            }
-        }
-
-        if (!CryptCreateHash(CryptProvider.Handle, CALG_SHA1, NULL, 0, &Ctx.hHash)) {
-            auto err = GetLastError();
-            throw std::system_error(err, std::system_category());
-        }
-
+        ContextType Ctx = ContextCreate();
         ContextUpdate(Ctx, lpBuffer, cbBuffer);
 
         return Ctx;

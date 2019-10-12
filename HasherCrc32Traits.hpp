@@ -101,7 +101,7 @@ struct HasherCrc32Traits {
     }
 };
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 #include <windows.h>
 
 #ifdef __cplusplus
