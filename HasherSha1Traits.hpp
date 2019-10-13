@@ -2,7 +2,8 @@
 
 #ifndef _WIN32
 #include <string.h>
-#include "cryptonite/cryptonite_sha1.h"
+#include <openssl/crypto.h>
+#include <openssl/sha.h>
 
 //ndef _WIN32
 struct HasherSha1Traits {
@@ -14,64 +15,36 @@ public:
         unsigned char Bytes[DigestSize];
     };
 
-    struct ContextType {
-        struct sha1_ctx* hHash;
-
-        ContextType() noexcept :
-            hHash(NULL) {}
-
-        ContextType(const ContextType& Other) noexcept = default;
-
-        ContextType(ContextType&& Other) noexcept : hHash(Other.hHash) {
-            Other.hHash = NULL;
-        }
-
-        ContextType& operator=(const ContextType& Other) noexcept = default;
-
-        ContextType& operator=(ContextType&& Other) noexcept {
-            hHash = Other.hHash;
-            Other.hHash = NULL;
-            return *this;
-        }
-    };
+    using ContextType = SHA_CTX;
 
 public:
     static inline ContextType ContextCreate() {
         ContextType Ctx;
-        Ctx.hHash = (struct sha1_ctx*)malloc(sizeof(sha1_ctx));
-        cryptonite_sha1_init(Ctx.hHash);
-
+        SHA1_Init(&Ctx);
         return Ctx;
     }
 
     static inline ContextType ContextCreate(const void* lpBuffer, size_t cbBuffer) {
         ContextType Ctx = ContextCreate();
         ContextUpdate(Ctx, lpBuffer, cbBuffer);
-
         return Ctx;
     }
 
     static inline ContextType ContextCopy(const ContextType& Ctx) {
-        ContextType NewCtx;
-        NewCtx.hHash = (struct sha1_ctx*)malloc(sizeof(sha1_ctx));
-        memcpy(NewCtx.hHash,Ctx.hHash,sizeof(sha1_ctx));
-
-        return NewCtx;
+        return Ctx;
     }
 
     static inline void ContextUpdate(ContextType& Ctx, const void* lpBuffer, size_t cbBuffer) {
-        cryptonite_sha1_update(Ctx.hHash, (unsigned char*)lpBuffer, cbBuffer);
+        SHA1_Update(&Ctx, lpBuffer, cbBuffer);
     }
 
     static inline void ContextEvaluate(const ContextType& Ctx, DigestType& Digest) {
-        cryptonite_sha1_finalize(Ctx.hHash, Digest.Bytes);
+        auto ForkedCtx = ContextCopy(Ctx);
+        SHA1_Final(Digest.Bytes, &ForkedCtx);
     }
 
     static inline void ContextDestroy(ContextType& Ctx) noexcept {
-        if (Ctx.hHash) {
-            free(Ctx.hHash);
-            Ctx.hHash = NULL;
-        }
+        OPENSSL_cleanse(&Ctx, sizeof(Ctx));
     }
 };
 #else
