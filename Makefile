@@ -32,9 +32,9 @@ keygen: $(KEYGEM_HEADER) $(KEYGEN_SOURCE)
 	$(CC) -std=c++17 -O2 \
 $(if $(OPENSSL_INCLUDE_PATH),-I$(OPENSSL_INCLUDE_PATH),) $(if $(OPENSSL_LIB_PATH),-L$(OPENSSL_LIB_PATH),) \
 $(if $(MPIR_INCLUDE_PATH),-I$(MPIR_INCLUDE_PATH),) $(if $(MPIR_LIB_PATH),-L$(MPIR_LIB_PATH),) \
--lcrypto -lmpir \
 $(KEYGEN_SOURCE) \
--o $(KEYGEN_BINARY)
+-o $(KEYGEN_BINARY) \
+-lcrypto -lmpir
 	@echo 'Done.'
 
 .PHONY: keygen
