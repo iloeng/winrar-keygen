@@ -14,7 +14,7 @@ This repository will tell you how WinRAR license file `"rarreg.key"` is generate
 
 ## 2. How is "rarreg.key" generated?
 
-See [here](README.HOW_DOES_IT_WORK.md).
+See [here](doc/how-does-it-work.md).
 
 ## 3. How to build?
 

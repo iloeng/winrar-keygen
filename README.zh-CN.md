@@ -12,7 +12,7 @@ WinRAR不是免费的软件。如果你想使用它，你应当向[__RARLAB__](h
 
 ## 2. "rarreg.key"是如何生成的？
 
-见[这里](README.HOW_DOES_IT_WORK.zh-CN.md)。
+见[这里](doc/how-does-it-work.zh-CN.md)。
 
 ## 3. 如何编译？
 
