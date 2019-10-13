@@ -18,41 +18,11 @@ See [here](doc/how-does-it-work.md).
 
 ## 3. How to build?
 
-### 3.1 Prerequisites
+This project supports both __Windows__ and __Linux/macOS__ platform.
 
-1. Please make sure that you have __Visual Studio 2019__ or the higher. Because this is a VS2019 project.
+To compile, see [here](doc/how-to-build.md).
 
-2. Please make sure you have installed `vcpkg` and the following libraries: 
-
-   * `mpir:x86-windows-static`
-   * `mpir:x64-windows-static`
-
-   is installed.
-
-   You can install them by:
-
-   ```console
-   $ vcpkg install mpir:x86-windows-static
-   $ vcpkg install mpir:x64-windows-static
-   ```
-
-3. Your `vcpkg` has been integrated into your __Visual Studio__, which means you have run 
-
-   ```console
-   $ vcpkg integrate install
-   ```
-   
-   successfully.
-
-### 3.2 Build
-
-1. Open this project in __Visual Studio__.
-
-2. Select `Release` configuration.
-
-3. Select __Build > Build Solution__.
-
-You will see executable files in `bin/` directory. 
+PS: Thanks to Multi for providing unix support.
 
 ## 4. How to Use?
 

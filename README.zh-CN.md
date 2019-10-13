@@ -16,35 +16,11 @@ WinRAR不是免费的软件。如果你想使用它，你应当向[__RARLAB__](h
 
 ## 3. 如何编译？
 
-### 3.1 前提条件
+该项目支持 __Windows__ 和 __Linux/macOS__ 平台。
 
-1. 请确保你有 __Visual Studio 2019__ 或其更高版本。因为这是一个VS2019项目。
+请见[这里](doc/how-to-build.zh-CN.md)来完成编译。
 
-2. 请确保你安装了 `vcpkg` 以及下面几个库：
-
-   * `mpir:x86-windows-static`
-   * `mpir:x64-windows-static`
-
-   你可以通过下的命令来安装：
-
-   ```console
-   $ vcpkg install mpir:x86-windows-static
-   $ vcpkg install mpir:x64-windows-static
-   ```
-
-3. 你的 `vcpkg` 与 __Visual Studio__ 整合了，即你曾成功运行了下面这条命令：
-
-   ```console
-   $ vcpkg integrate install
-   ```
-
-### 3.2 编译
-
-1. 在 __Visual Studio__ 中打开这个项目。
-
-2. 选择 `Release` 配置。
-
-3. 选择 __生成 > 生成解决方案__。
+PS: 感谢Multi提供unix的支持。
 
 ## 4. 如何使用？
 
